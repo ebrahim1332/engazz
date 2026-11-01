@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_auth_service.dart';
 import 'storage_service.dart';
+import '../widgets/app_update_dialog.dart';
 
 class UpdateInfo {
   final int latestVersionCode;
@@ -187,162 +187,12 @@ class AppConfigService {
     return null;
   }
 
-  /// عرض دايلوج التحديث الإجباري (لا يمكن للمستخدم إغلاقه أو تجاوزه)
+  /// عرض دايلوج التحديث المباشر مع شريط تقدم وتثبيت تلقائي
   static void showForceUpdateDialog(BuildContext context, UpdateInfo update) {
     showDialog(
       context: context,
-      barrierDismissible: false,
-      builder: (ctx) {
-        return PopScope(
-          canPop: false,
-          child: Directionality(
-            textDirection: TextDirection.rtl,
-            child: AlertDialog(
-              backgroundColor: const Color(0xFF071911),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(28),
-                side: BorderSide(
-                  color: const Color(0xFF1ED760).withValues(alpha: 0.35),
-                  width: 1.5,
-                ),
-              ),
-              contentPadding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 76,
-                    height: 76,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF0F9B58), Color(0xFF1ED760)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF1ED760).withValues(alpha: 0.45),
-                          blurRadius: 26,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.system_update_rounded,
-                      color: Colors.white,
-                      size: 40,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    update.title,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0E3827),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      'الإصدار الجديد: ${update.latestVersionName}',
-                      style: const TextStyle(
-                        color: Color(0xFF1ED760),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.1),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Row(
-                          children: [
-                            Icon(Icons.stars_rounded, color: Color(0xFF1ED760), size: 18),
-                            SizedBox(width: 6),
-                            Text(
-                              'ما الجديد في هذا التحديث:',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          update.releaseNotes,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.9),
-                            fontSize: 13.5,
-                            height: 1.45,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1ED760),
-                        foregroundColor: const Color(0xFF071911),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      onPressed: () async {
-                        if (update.downloadUrl.isNotEmpty) {
-                          final uri = Uri.tryParse(update.downloadUrl);
-                          if (uri != null) {
-                            await launchUrl(uri, mode: LaunchMode.externalApplication);
-                          }
-                        }
-                      },
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.download_rounded, size: 22),
-                          SizedBox(width: 8),
-                          Text(
-                            'تحديث التطبيق الآن',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
+      barrierDismissible: !update.isMandatory,
+      builder: (ctx) => AppUpdateDialog(update: update),
     );
   }
 
