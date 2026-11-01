@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "193637904272",
+    "project_id": "engazz-35e60",
+    "storage_bucket": "engazz-35e60.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:193637904272:android:5b45ecd9ae221ed7908d15",
+        "android_client_info": {
+          "package_name": "com.example.engazz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "193637904272-fg6ngfi7gd696q056ea49v4v68lv54v3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.engazz",
+            "certificate_hash": "e2305209bce7463bee0a1ea18dedb1947474b56a"
+          }
+        },
+        {
+          "client_id": "193637904272-tjkdmkcfveeqsafoj5d1cvrdb3seq7n0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoQ7M7hAMGWB8HyPtXOIWhp3sxtYuvb94"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "193637904272-tjkdmkcfveeqsafoj5d1cvrdb3seq7n0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

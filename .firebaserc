@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "engazz-35e60"
+  },
+  "targets": {
+    "engazz-35e60": {
+      "hosting": {
+        "promo": [
+          "engazz-eg"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Engazz – تطبيق الإنتاجية</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+
+  <!-- Screenshot mapping:
+    083 = أيامي (Main/Days screen)
+    082 = المهام (Tasks list)
+    081 = المؤقت جاري (Timer running Stop/End)
+    080 = إضافة مهمة (Add task dialog)
+    078 = المؤقت مع جلسة (Timer + session)
+    079 = التقويم (Calendar picker)
+    076 = التخطيط أهداف (Planning goals)
+    075 = التخطيط ملاحظات (Planning notes)
+    074 = التخطيط عادات (Planning habits)
+    073 = التحليلات (Analytics full)
+    072 = التحليلات جلسات (Analytics sessions)
+    077 = التخطيط أهداف محقق (Goals achieved)
+  -->
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-dark: #0a2e14;
+      --green-mid: #145a28;
+      --green-main: #1e8a3e;
+      --green-bright: #2dba57;
+      --green-light: #4cdf7a;
+      --text-white: #ffffff;
+      --text-muted: #a0c8aa;
+    }
+
+    body {
+      font-family: 'Cairo', 'Inter', sans-serif;
+      background: var(--green-dark);
+      color: var(--text-white);
+      overflow-x: hidden;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      padding: 60px 20px 100px;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 20%, #1e8a3e55 0%, transparent 70%),
+                  radial-gradient(ellipse 50% 80% at 80% 80%, #0d4a2022 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .particle {
+      position: absolute;
+      width: 3px; height: 3px;
+      background: var(--green-bright);
+      border-radius: 50%;
+      opacity: 0.4;
+      animation: float linear infinite;
+    }
+    @keyframes float {
+      0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+      10%  { opacity: 0.5; }
+      90%  { opacity: 0.3; }
+      100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(46,186,87,0.15);
+      border: 1px solid rgba(46,186,87,0.4);
+      border-radius: 50px;
+      padding: 6px 18px;
+      font-size: 13px; color: var(--green-light);
+      margin-bottom: 28px;
+      animation: fadeDown 0.8s ease;
+    }
+
+    .hero-title {
+      font-size: clamp(52px, 10vw, 96px);
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 1;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #ffffff 30%, #4cdf7a 70%, #2dba57 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: fadeDown 0.9s ease;
+    }
+
+    .hero-sub {
+      font-size: clamp(16px, 3vw, 22px);
+      color: var(--text-muted);
+      font-weight: 300;
+      margin-bottom: 32px;
+      max-width: 480px;
+      animation: fadeDown 1s ease;
+    }
+
+    .hero-download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--green-main), var(--green-bright));
+      color: #fff;
+      font-family: 'Cairo', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 14px 40px;
+      border-radius: 50px;
+      text-decoration: none;
+      box-shadow: 0 8px 30px rgba(46,186,87,0.45), 0 0 0 1px rgba(255,255,255,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-bottom: 48px;
+      animation: fadeDown 1.05s ease;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-download-btn:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 14px 40px rgba(46,186,87,0.6), 0 0 0 1px rgba(255,255,255,0.1);
+    }
+    .hero-download-btn svg { flex-shrink: 0; }
+
+    .phones-hero {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 20px;
+      animation: fadeUp 1.1s ease;
+    }
+
+    .phone-wrap { display: flex; flex-direction: column; align-items: center; }
+    .phone-wrap.center { transform: translateY(-30px) scale(1.08); z-index: 2; }
+    .phone-wrap.side   { opacity: 0.75; transform: scale(0.92) rotate(var(--r)); }
+    .phone-wrap:nth-child(1) { --r: -6deg; }
+    .phone-wrap:nth-child(3) { --r:  6deg; }
+
+    .phone {
+      width: 200px;
+      background: #0c0c0c;
+      border-radius: 28px;
+      padding: 5px;
+      box-shadow: 0 0 0 1px #333, 0 30px 80px rgba(0,0,0,0.7), 0 0 40px rgba(45,186,87,0.15);
+      position: relative;
+    }
+    .phone.large { width: 230px; }
+    .phone::before {
+      content: '';
+      position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+      width: 44px; height: 4px;
+      background: #1a1a1a; border-radius: 10px; z-index: 3;
+    }
+
+    .phone-screen {
+      border-radius: 24px;
+      overflow: hidden;
+      aspect-ratio: 9/19;
+      background: #111;
+    }
+    .phone-screen img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: top;
+      display: block;
+    }
+
+    .section { padding: 100px 40px; position: relative; }
+    .section-divider {
+      width: 100%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(46,186,87,0.3), transparent);
+    }
+
+    .feature-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 80px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .feature-row.reverse { flex-direction: row-reverse; }
+
+    .feature-text { flex: 1; max-width: 440px; }
+    .feature-tag {
+      display: inline-block;
+      background: rgba(46,186,87,0.12);
+      border: 1px solid rgba(46,186,87,0.35);
+      color: var(--green-light);
+      font-size: 12px; padding: 4px 14px;
+      border-radius: 50px; margin-bottom: 16px;
+      letter-spacing: 1px; text-transform: uppercase;
+    }
+    .feature-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800; line-height: 1.15; margin-bottom: 14px;
+      background: linear-gradient(135deg, #fff 50%, #4cdf7a);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .feature-desc {
+      font-size: 16px; color: var(--text-muted); line-height: 1.8; font-weight: 300;
+    }
+
+    .phone-single {
+      flex-shrink: 0; width: 240px;
+      background: #0c0c0c; border-radius: 30px; padding: 6px;
+      box-shadow: 0 0 0 1px #2a2a2a, 0 40px 100px rgba(0,0,0,0.6), 0 0 60px rgba(45,186,87,0.12);
+      position: relative;
+    }
+    .phone-single::before {
+      content: '';
+      position: absolute; top: 9px; left: 50%; transform: translateX(-50%);
+      width: 44px; height: 4px; background: #1c1c1c; border-radius: 10px; z-index: 3;
+    }
+    .phone-single .phone-screen { border-radius: 25px; }
+
+    .grid-section { padding: 40px 0; max-width: 1100px; margin: 0 auto; width: 100%; }
+    .section-header { text-align: center; margin-bottom: 50px; }
+    .section-header h2 {
+      font-size: clamp(28px, 5vw, 48px); font-weight: 800;
+      background: linear-gradient(135deg, #fff 40%, #4cdf7a);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+    .section-header p { color: var(--text-muted); font-size: 16px; font-weight: 300; }
+
+    .phones-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+      align-items: start;
+      justify-items: center;
+      width: 100%;
+    }
+
+    .phone-card { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      text-align: center;
+      gap: 20px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .phone-card .phone-mini {
+      width: 180px; background: #0c0c0c; border-radius: 24px; padding: 5px;
+      box-shadow: 0 0 0 1px #2a2a2a, 0 25px 60px rgba(0,0,0,0.5), 0 0 30px rgba(45,186,87,0.1);
+      position: relative;
+    }
+    .phone-card .phone-mini::before {
+      content: '';
+      position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+      width: 36px; height: 3px; background: #1c1c1c; border-radius: 10px; z-index: 3;
+    }
+    .phone-mini .phone-screen { border-radius: 20px; }
+
+    .phone-card-label { text-align: center; }
+    .phone-card-label h3 { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .phone-card-label p  { font-size: 13px; color: var(--text-muted); font-weight: 300; }
+
+    .two-phones { display: flex; gap: 20px; align-items: flex-end; flex-shrink: 0; }
+    .two-phones .phone-single:first-child { transform: translateY(20px) rotate(-4deg); }
+    .two-phones .phone-single:last-child  { transform: rotate(4deg); }
+    .two-phones .phone-single { width: 190px; }
+
+    .cta-section {
+      padding: 100px 40px; text-align: center; position: relative; overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 50%, #1e8a3e33 0%, transparent 70%);
+    }
+    .cta-title {
+      font-size: clamp(32px, 6vw, 64px); font-weight: 900; margin-bottom: 16px;
+      background: linear-gradient(135deg, #fff, #4cdf7a);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; position: relative;
+    }
+    .cta-desc { font-size: 18px; color: var(--text-muted); margin-bottom: 40px; position: relative; }
+    .cta-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, var(--green-main), var(--green-bright));
+      color: #fff; font-family: 'Cairo', sans-serif;
+      font-size: 18px; font-weight: 700; padding: 16px 48px;
+      border-radius: 50px; text-decoration: none;
+      box-shadow: 0 8px 30px rgba(46,186,87,0.4);
+      transition: transform 0.2s, box-shadow 0.2s; position: relative;
+    }
+    .cta-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(46,186,87,0.6); }
+
+    .footer {
+      padding: 40px; text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.25); font-size: 13px;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(50px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse-glow {
+      0%,100% { box-shadow: 0 0 0 1px #2a2a2a, 0 0 40px rgba(45,186,87,0.1); }
+      50%      { box-shadow: 0 0 0 1px #2a2a2a, 0 0 60px rgba(45,186,87,0.25); }
+    }
+    .phone-single, .phone { animation: pulse-glow 4s ease-in-out infinite; }
+
+    @media (max-width: 900px) {
+      .section { padding: 60px 24px; }
+      .feature-row, .feature-row.reverse { flex-direction: column; gap: 40px; text-align: center; }
+      .feature-text { max-width: 100%; }
+      .phones-hero .phone-wrap.side { display: none; }
+      .phones-grid { 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 30px;
+        justify-items: center;
+        justify-content: center;
+      }
+      .two-phones { gap: 14px; justify-content: center; }
+      .two-phones .phone-single { width: 160px; }
+    }
+
+    @media (max-width: 640px) {
+      .hero { padding: 70px 16px 40px; }
+      .section { padding: 50px 16px; }
+      .grid-section { padding: 10px 0; }
+      .phones-grid { 
+        grid-template-columns: 1fr; 
+        gap: 36px;
+        justify-items: center;
+        justify-content: center;
+        max-width: 280px;
+        margin: 0 auto;
+      }
+      .phone-card {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+      }
+      .phone-card .phone-mini {
+        width: 200px;
+        margin: 0 auto;
+      }
+      .two-phones {
+        justify-content: center;
+        align-items: center;
+      }
+      .two-phones .phone-single { width: 140px; }
+      .cta-section { padding: 70px 20px; }
+    }
+  </style>
+
+  <!-- Firebase SDKs to link download buttons dynamically to Admin panel -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<div class="particles" id="particles"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge"><span>⚡</span> تطبيق إنتاجية متكامل</div>
+  <h1 class="hero-title">Engazz</h1>
+  <p class="hero-sub">تتبع وقتك، نظم مهامك، وخطط لأهدافك — كل شيء في مكان واحد</p>
+  <a href="#" class="hero-download-btn">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    حمّل التطبيق مجاناً
+  </a>
+
+  <div class="phones-hero">
+    <div class="phone-wrap side">
+      <div class="phone">
+        <div class="phone-screen"><img src="photo_5996669352435983082_y.jpg" alt="Tasks" /></div>
+      </div>
+    </div>
+    <div class="phone-wrap center">
+      <div class="phone large">
+        <div class="phone-screen"><img src="photo_5996669352435983083_y.jpg" alt="Main" /></div>
+      </div>
+    </div>
+    <div class="phone-wrap side">
+      <div class="phone">
+        <div class="phone-screen"><img src="photo_5996669352435983081_y.jpg" alt="Timer" /></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- FEATURE 1 – Timer -->
+<section class="section">
+  <div class="feature-row">
+    <div class="feature-text">
+      <span class="feature-tag">🎯 التركيز</span>
+      <h2 class="feature-title">مؤقت ذكي لجلسات التركيز</h2>
+      <p class="feature-desc">
+        ابدأ جلسة تركيز في ثوانٍ. يسجّل التطبيق كل جلسة تلقائياً ويظهرها في قائمة يومية تساعدك على قياس إنتاجيتك الفعلية.
+      </p>
+    </div>
+    <div class="two-phones">
+      <div class="phone-single"><div class="phone-screen"><img src="photo_5996669352435983081_y.jpg" alt="Timer running" /></div></div>
+      <div class="phone-single"><div class="phone-screen"><img src="photo_5996669352435983078_y.jpg" alt="Timer sessions" /></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- FEATURE 2 – Tasks -->
+<section class="section">
+  <div class="feature-row reverse">
+    <div class="feature-text">
+      <span class="feature-tag">✅ المهام</span>
+      <h2 class="feature-title">أضف مهامك وتابعها بسهولة</h2>
+      <p class="feature-desc">
+        أنشئ مهام يومية مع تحديد وقت مستهدف لكل مهمة. الواجهة البسيطة تجعل إضافة المهام أمراً لا يستغرق ثوانٍ.
+      </p>
+    </div>
+    <div class="two-phones">
+      <div class="phone-single"><div class="phone-screen"><img src="photo_5996669352435983082_y.jpg" alt="Tasks list" /></div></div>
+      <div class="phone-single"><div class="phone-screen"><img src="photo_5996669352435983080_y.jpg" alt="Add task" /></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- FEATURE 3 – Planning -->
+<section class="section">
+  <div class="feature-row">
+    <div class="feature-text">
+      <span class="feature-tag">🧠 التخطيط</span>
+      <h2 class="feature-title">خطط لأهدافك وملاحظاتك</h2>
+      <p class="feature-desc">
+        قسم التخطيط يمنحك مساحة لتسجيل أهدافك وعاداتك وملاحظاتك — كل شيء منظم وجاهز متى احتجته.
+      </p>
+    </div>
+    <div class="two-phones">
+      <div class="phone-single"><div class="phone-screen"><img src="photo_5996669352435983076_y.jpg" alt="Planning goals" /></div></div>
+      <div class="phone-single"><div class="phone-screen"><img src="photo_5996669352435983075_y.jpg" alt="Planning notes" /></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- GRID -->
+<section class="section" style="padding-top:80px">
+  <div class="grid-section">
+    <div class="section-header">
+      <h2>كل ما تحتاجه في تطبيق واحد</h2>
+      <p>واجهة نظيفة وسهلة الاستخدام لكل المميزات</p>
+    </div>
+    <div class="phones-grid">
+      <div class="phone-card">
+        <div class="phone-mini"><div class="phone-screen"><img src="photo_5996669352435983083_y.jpg" alt="أيامي" /></div></div>
+        <div class="phone-card-label"><h3>📅 أيامي</h3><p>تتبع يومياتك بالتاريخ</p></div>
+      </div>
+      <div class="phone-card">
+        <div class="phone-mini"><div class="phone-screen"><img src="photo_5996669352435983079_y.jpg" alt="التقويم" /></div></div>
+        <div class="phone-card-label"><h3>🗓️ التقويم</h3><p>اختر اليوم بسهولة</p></div>
+      </div>
+      <div class="phone-card">
+        <div class="phone-mini"><div class="phone-screen"><img src="photo_5996669352435983078_y.jpg" alt="الجلسات" /></div></div>
+        <div class="phone-card-label"><h3>⏱️ الجلسات</h3><p>سجل كل جلسة تلقائياً</p></div>
+      </div>
+      <div class="phone-card">
+        <div class="phone-mini"><div class="phone-screen"><img src="photo_5996669352435983080_y.jpg" alt="إضافة مهمة" /></div></div>
+        <div class="phone-card-label"><h3>➕ إضافة مهمة</h3><p>حدد الوقت المستهدف</p></div>
+      </div>
+      <div class="phone-card">
+        <div class="phone-mini"><div class="phone-screen"><img src="photo_5996669352435983073_y.jpg" alt="التحليلات" /></div></div>
+        <div class="phone-card-label"><h3>📊 التحليلات</h3><p>تابع إنجازاتك وتقدمك</p></div>
+      </div>
+      <div class="phone-card">
+        <div class="phone-mini"><div class="phone-screen"><img src="photo_5996669352435983074_y.jpg" alt="العادات" /></div></div>
+        <div class="phone-card-label"><h3>🔥 العادات</h3><p>ابن عادات يومية قوية</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="cta-title">ابدأ رحلتك الإنتاجية اليوم</h2>
+  <p class="cta-desc">مجاني تماماً — حمّل التطبيق وابدأ فوراً</p>
+  <a href="#" class="cta-btn">⚡ حمّل Engazz الآن</a>
+</section>
+
+<div class="footer">© 2026 Engazz — جميع الحقوق محفوظة</div>
+
+<script>
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.cssText = `
+      left:${Math.random()*100}%;
+      width:${1+Math.random()*3}px;
+      height:${1+Math.random()*3}px;
+      animation-duration:${6+Math.random()*10}s;
+      animation-delay:${-Math.random()*10}s;
+      opacity:${0.2+Math.random()*0.4};
+    `;
+    container.appendChild(p);
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0) rotate(0deg)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.feature-row, .phone-card, .cta-title').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(40px)';
+    el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+    observer.observe(el);
+  });
+
+  // Dynamic Download Link from Admin Firestore Settings
+  const firebaseConfig = {
+    apiKey: "AIzaSyDoQ7M7hAMGWB8HyPtXOIWhp3sxtYuvb94",
+    authDomain: "engazz-35e60.firebaseapp.com",
+    projectId: "engazz-35e60",
+    storageBucket: "engazz-35e60.firebasestorage.app",
+    messagingSenderId: "193637904272",
+    appId: "1:193637904272:web:5b45ecd9ae221ed7908d15"
+  };
+
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // جلب رابط التحميل الذي تضعه في لوحة تحكم الأدمن وتطبيقه على أزرار الصفحة
+  db.collection('app_config').doc('update').onSnapshot(doc => {
+    if (doc.exists && doc.data().downloadUrl) {
+      const url = doc.data().downloadUrl;
+      document.querySelectorAll('.hero-download-btn, .cta-btn').forEach(btn => {
+        btn.href = url;
+        btn.target = '_blank';
+      });
+    }
+  }, err => console.warn('Download link sync error:', err));
+</script>
+</body>
+</html>
