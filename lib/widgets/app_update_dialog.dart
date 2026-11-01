@@ -487,13 +487,6 @@ class _AppUpdateDialogState extends State<AppUpdateDialog> {
                     ),
                   ),
                 ),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
               ] else if (_state == UpdateDownloadState.error) ...[
                 Row(
                   children: [
