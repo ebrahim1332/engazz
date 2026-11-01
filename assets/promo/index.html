@@ -557,13 +557,46 @@
   if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
+  let currentDownloadUrl = '';
+
+  function startDirectDownload(url) {
+    if (!url) return;
+    // إنشاء رابط وهمي خفي وبدء التنزيل فوراً بدون فتح أي تبويب خارجي أو التوجه لصفحة وسيطة
+    const tempLink = document.createElement('a');
+    tempLink.href = url;
+    tempLink.setAttribute('download', 'Engazz.apk');
+    tempLink.style.display = 'none';
+    document.body.appendChild(tempLink);
+    tempLink.click();
+    setTimeout(() => tempLink.remove(), 2000);
+  }
+
+  // تفعيل التنزيل السلس لجميع أزرار التحميل في الصفحة
+  document.querySelectorAll('.hero-download-btn, .cta-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      if (currentDownloadUrl) {
+        e.preventDefault();
+        const originalContent = this.innerHTML;
+        this.innerHTML = '<span>⚡</span> جاري بدء التنزيل...';
+        this.style.pointerEvents = 'none';
+        
+        startDirectDownload(currentDownloadUrl);
+
+        setTimeout(() => {
+          this.innerHTML = originalContent;
+          this.style.pointerEvents = 'auto';
+        }, 2500);
+      }
+    });
+  });
+
   // جلب رابط التحميل الذي تضعه في لوحة تحكم الأدمن وتطبيقه على أزرار الصفحة
   db.collection('app_config').doc('update').onSnapshot(doc => {
     if (doc.exists && doc.data().downloadUrl) {
-      const url = doc.data().downloadUrl;
+      currentDownloadUrl = doc.data().downloadUrl;
       document.querySelectorAll('.hero-download-btn, .cta-btn').forEach(btn => {
-        btn.href = url;
-        btn.target = '_blank';
+        btn.href = currentDownloadUrl;
+        btn.removeAttribute('target');
       });
     }
   }, err => console.warn('Download link sync error:', err));
