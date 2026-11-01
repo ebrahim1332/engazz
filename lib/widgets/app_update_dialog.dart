@@ -350,7 +350,7 @@ class _AppUpdateDialogState extends State<AppUpdateDialog> {
               if (_state == UpdateDownloadState.completed) ...[
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: const Color(0xFF1ED760).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
@@ -358,17 +358,36 @@ class _AppUpdateDialogState extends State<AppUpdateDialog> {
                       color: const Color(0xFF1ED760).withValues(alpha: 0.3),
                     ),
                   ),
-                  child: const Row(
+                  child: const Column(
                     children: [
-                      Icon(Icons.check_circle, color: Color(0xFF1ED760), size: 24),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          'اكتمل التحميل بنجاح! إذا لم تظهر شاشة التثبيت اضغط على الزر أدناه.',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1ED760)),
+                            ),
                           ),
+                          SizedBox(width: 12),
+                          Text(
+                            'اكتمل التحميل، جاري فتح التثبيت...',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        'يرجى تأكيد التثبيت من نافذة النظام',
+                        style: TextStyle(
+                          color: Colors.white54,
+                          fontSize: 11.5,
                         ),
                       ),
                     ],
@@ -444,14 +463,13 @@ class _AppUpdateDialogState extends State<AppUpdateDialog> {
               ] else if (_state == UpdateDownloadState.completed) ...[
                 SizedBox(
                   width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1ED760),
-                      foregroundColor: const Color(0xFF071911),
-                      elevation: 0,
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF1ED760),
+                      side: const BorderSide(color: Color(0xFF1ED760), width: 1.2),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
                     onPressed: () {
@@ -459,15 +477,16 @@ class _AppUpdateDialogState extends State<AppUpdateDialog> {
                         _installApk(_downloadedFilePath!);
                       }
                     },
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.install_mobile_rounded, size: 22),
-                        SizedBox(width: 8),
-                        Text(
-                          'تثبيت التحديث الآن',
-                          style: TextStyle(
-                            fontSize: 16,
+                    icon: const Icon(Icons.refresh_rounded, size: 20),
+                    label: const Text(
+                      'إعادة فتح نافذة التثبيت',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
                             fontWeight: FontWeight.bold,
                           ),
                         ),

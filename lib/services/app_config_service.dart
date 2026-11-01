@@ -25,8 +25,8 @@ class UpdateInfo {
 
 class AppConfigService {
   /// رقم وإصدار التطبيق الحالي
-  static const int currentVersionCode = 1;
-  static const String currentVersionName = '1.0.0';
+  static const int currentVersionCode = 2;
+  static const String currentVersionName = '1.0.1';
 
   static FirebaseFirestore? get _db =>
       FirebaseAuthService.isFirebaseInitialized ? FirebaseFirestore.instance : null;
